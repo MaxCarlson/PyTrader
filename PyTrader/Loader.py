@@ -4,8 +4,10 @@ from datetime import *
 
 class Loader():
         
+    
     def __init__(self):
-        self.tickers = {}
+        self.epoch      = '1970-1-1'
+        self.tickers    = {}
 
     def load(self, filename='WIKI_PRICES.csv', delimiter=','):
         with open(filename) as csv_file:
@@ -25,10 +27,25 @@ class Loader():
 
 
     def process(self):
-        epoch   = '1970-1-1'
-        dateStr = self.tickers['A'][0][0]
-        d0      = datetime.strptime(epoch,   '%Y-%m-%d').date()
-        d1      = datetime.strptime(dateStr, '%Y-%m-%d').date()
-        dateInt = (d1 - d0).days
+        d0 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
+        
+        data = np.array([])
+
+        for ticker, data in self.tickers.items():
+            if ticker == 'ticker':
+                continue
+            i = 0
+            for row in data:
+                d1      = datetime.strptime(row[0], '%Y-%m-%d').date()
+                dateInt = (d1 - d0).days
+
+                array = [dateInt] + [float(x) for x in row[1:]]
+
+                data[i] = array
+                #npdata = np.array(row, dtype='float')
+                i+=1
+
+        
+
         a = 5
 
