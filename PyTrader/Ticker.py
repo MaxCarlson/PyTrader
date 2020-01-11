@@ -21,11 +21,20 @@ class Ticker():
                 self.startDate = dateInt
 
             # Do our best to correct missing data
-            arow = [dateInt]
-            idx = 1
+            idx     = 1
+            arow    = [dateInt]
             for v in row[1:]:
                 if v == '':
-                    v = prevRow[idx]
+                    found = False
+                    for p in range(-1, -10, -1):
+                        if data[i+p][idx] != '':
+                            v = data[i+p][idx]
+                            break
+
+                    # If there is too big a gap, stop trying to fix it
+                    if found == False:
+                        break
+
                 arow.append(float(v))
                 idx += 1
 
