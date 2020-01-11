@@ -1,6 +1,5 @@
 from datetime import datetime
 import numpy as np
-import pickle
 
 class Ticker():
 
@@ -23,13 +22,15 @@ class Ticker():
 
             # Do our best to correct missing data
             arow = [dateInt]
-            idx = 0
+            idx = 1
             for v in row[1:]:
                 if v == '':
                     v = prevRow[idx]
                 arow.append(float(v))
                 idx += 1
 
-            array.append(arow)
             i+=1
+            prevRow = row
+            array.append(arow)
+        
         self.data = array

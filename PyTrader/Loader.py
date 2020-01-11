@@ -1,8 +1,9 @@
-import numpy as np
 import csv
-from datetime import datetime
-from Ticker import *
 import random
+import pickle
+import numpy as np
+from Ticker import *
+from datetime import datetime
 
 class Loader():
         
@@ -25,12 +26,18 @@ class Loader():
                     self.uTickers[line[0]] = [line[1:]]
                 
                 # Just for fast testing
-                i += 1
-                if i >= 1000:
-                   break
+                #i += 1
+                #if i >= 50000:
+                #   break
 
         self.createTickers()
 
+    def loadPickle(self, filename):
+        self = pickle.load(filename, 'rb')
+
+    def save(self, filename):
+        fileHandle = open(filename, 'wb')
+        pickle.dump(self, fileHandle)
 
     def createTickers(self):
         d0 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
@@ -41,6 +48,8 @@ class Loader():
 
             self.symbols.append(ticker)
             self.tickers[ticker] = Ticker(ticker, data, d0)
+
+        self.save('allTickers.bin')
 
     def processTickers(self, num, startDate):
 
