@@ -2,39 +2,71 @@ import numpy as np
 import csv
 from datetime import datetime
 from Ticker import *
+import random
 
 class Loader():
         
     
     def __init__(self):
-        self.epoch      = '1970-1-1'
-        self.tickers    = {}
+        self.epoch          = '1970-1-1'
+        self.uTickers       = {}
+        self.tickers        = {} 
+        self.symbols        = []
+        self.activeTickers  = {}
 
-    def load(self, filename='WIKI_PRICES.csv', delimiter=','):
+    def loadCSV(self, filename='WIKI_PRICES.csv', delimiter=','):
         with open(filename) as csv_file:
             csvReader = csv.reader(csv_file, delimiter=delimiter)
             i = 0
             for line in csvReader:
-                if line[0] in self.tickers:
-                    self.tickers[line[0]].append(line[1:])
+                if line[0] in self.uTickers:
+                    self.uTickers[line[0]].append(line[1:])
                 else:
-                    self.tickers[line[0]] = [line[1:]]
+                    self.uTickers[line[0]] = [line[1:]]
                 
+                # Just for fast testing
                 i += 1
-                if i >= 100:
-                    break
+                if i >= 1000:
+                   break
 
-        self.process()
+        self.createTickers()
 
 
-    def process(self):
+    def createTickers(self):
         d0 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
         
-        for ticker, data in self.tickers.items():
+        for ticker, data in self.uTickers.items():
             if ticker == 'ticker':
                 continue
-            t = Ticker(ticker, data, d0)
 
+            self.symbols.append(ticker)
+            self.tickers[ticker] = Ticker(ticker, data, d0)
+
+    def processTickers(self, num, startDate):
+
+        d0 = datetime.strptime(startDate,  '%Y-%m-%d').date()
+        d1 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
+        startDateInt = (d0 - d1).days
+
+        if num > len(self.symbols):
+            print('Only', len(self.symbols), 'tickers exist. Reverting to only use existing.')
+            num = len(self.symbols)
+        
+        idxs = [i for i in range(num)]
+        random.shuffle(idxs)
+
+        choosen = 0
+        for idx in idxs:
+            symbol  = self.symbols[idx]
+            ticker  = self.tickers[symbol]
+            if ticker.startDate < startDateInt:
+                continue
+
+            self.activeTickers[symbol] = ticker
+            choosen += 1
+
+        if choosen < num:
+            print('Only', choosen, 'symbols found of the', num, 'desired')
         
 
         a = 5
