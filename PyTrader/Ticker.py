@@ -29,11 +29,13 @@ class Ticker():
                     for p in range(-1, -10, -1):
                         if data[i+p][idx] != '':
                             v = data[i+p][idx]
+                            found = True
                             break
 
                     # If there is too big a gap, stop trying to fix it
                     if found == False:
-                        break
+                        self.data = array
+                        return
 
                 arow.append(float(v))
                 idx += 1
