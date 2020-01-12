@@ -1,9 +1,9 @@
 from Loader import *
 from Simulation import *
 
-loader = Loader()
-#loader.loadPickle('allTickers.bin')
-loader.loadCSV()
+loader = Loader.loadPickle('allTickers.bin')
+#loader = Loader()
+#loader.loadCSV()
 loader.processTickers(500, '2000-1-1')
 
-sim = Simulation(loader)
+sim = Simulation(loader, '2000-3-1')

@@ -30,22 +30,24 @@ class Loader():
                     uTickers[line[0]] = [line[1:]]
                 
                 # Just for fast testing
-                if i > 1 and len(line[0]) > 1:
-                    break
-                i += 1
-                #if i >= 50000:
+                #if i > 1 and len(line[0]) > 1:
                 #    break
+                i += 1
+                if i >= 1000000:
+                    break
 
-        pi = pickle.dumps(uTickers)
-        size = sys.getsizeof(pi)
+        #pi = pickle.dumps(uTickers)
+        #size = sys.getsizeof(pi)
         self.createTickers(uTickers)
         
-
+    @classmethod
     def loadPickle(self, filename):
         with open(filename, 'rb') as pickleFile:
-            self = pickle.load(pickleFile)
+            return pickle.load(pickleFile)
 
     def save(self, filename):
+        #pi = pickle.dumps(self)
+        #size = sys.getsizeof(pi)
         fileHandle = open(filename, 'wb')
         pickle.dump(self, fileHandle)
 
