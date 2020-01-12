@@ -1,5 +1,7 @@
 from datetime import datetime
 import numpy as np
+import pickle
+import sys
 
 class Ticker():
 
@@ -45,3 +47,7 @@ class Ticker():
             array.append(arow)
         
         self.data = array
+
+        #pi2 = pickle.dumps(self)
+        #s2 = sys.getsizeof(pi2)
+        a = 5

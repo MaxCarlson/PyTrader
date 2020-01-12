@@ -5,44 +5,54 @@ import numpy as np
 from Ticker import *
 from datetime import datetime
 
+import sys
+
 class Loader():
         
     
     def __init__(self):
         self.epoch          = '1970-1-1'
-        self.uTickers       = {}
         self.tickers        = {} 
         self.symbols        = []
         self.activeTickers  = {}
 
     def loadCSV(self, filename='WIKI_PRICES.csv', delimiter=','):
+        
+        uTickers = {}
         with open(filename) as csv_file:
-            csvReader = csv.reader(csv_file, delimiter=delimiter)
             i = 0
+            csvReader = csv.reader(csv_file, delimiter=delimiter)
             for line in csvReader:
-                if line[0] in self.uTickers:
-                    self.uTickers[line[0]].append(line[1:])
+
+                if line[0] in uTickers:
+                    uTickers[line[0]].append(line[1:])
                 else:
-                    self.uTickers[line[0]] = [line[1:]]
+                    uTickers[line[0]] = [line[1:]]
                 
                 # Just for fast testing
-                #i += 1
+                if i > 1 and len(line[0]) > 1:
+                    break
+                i += 1
                 #if i >= 50000:
-                #   break
+                #    break
 
-        self.createTickers()
+        pi = pickle.dumps(uTickers)
+        size = sys.getsizeof(pi)
+        self.createTickers(uTickers)
+        
 
     def loadPickle(self, filename):
-        self = pickle.load(filename, 'rb')
+        with open(filename, 'rb') as pickleFile:
+            self = pickle.load(pickleFile)
 
     def save(self, filename):
         fileHandle = open(filename, 'wb')
         pickle.dump(self, fileHandle)
 
-    def createTickers(self):
+    def createTickers(self, uTickers):
         d0 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
         
-        for ticker, data in self.uTickers.items():
+        for ticker, data in uTickers.items():
             if ticker == 'ticker':
                 continue
 
