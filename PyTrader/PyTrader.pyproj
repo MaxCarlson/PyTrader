@@ -26,6 +26,9 @@
     <Compile Include="Simulation.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Strat.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Ticker.py">
       <SubType>Code</SubType>
     </Compile>

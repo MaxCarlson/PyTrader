@@ -32,12 +32,10 @@ class Loader():
                 # Just for fast testing
                 #if i > 1 and len(line[0]) > 1:
                 #    break
-                i += 1
-                if i >= 1000000:
-                    break
+                #i += 1
+                #if i >= 1000000:
+                #    break
 
-        #pi = pickle.dumps(uTickers)
-        #size = sys.getsizeof(pi)
         self.createTickers(uTickers)
         
     @classmethod
@@ -46,8 +44,6 @@ class Loader():
             return pickle.load(pickleFile)
 
     def save(self, filename):
-        #pi = pickle.dumps(self)
-        #size = sys.getsizeof(pi)
         fileHandle = open(filename, 'wb')
         pickle.dump(self, fileHandle)
 
@@ -87,8 +83,8 @@ class Loader():
             choosen += 1
 
         if choosen < num:
-            print('Only', choosen, 'symbols found of the', num, 'desired')
+            print('Only', choosen, 'symbols found of the', num, 'desired that fit the requirements')
         
 
-        a = 5
+        #a = 5
 
