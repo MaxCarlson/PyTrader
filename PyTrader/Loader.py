@@ -16,7 +16,7 @@ class Loader():
         self.symbols        = []
         self.activeTickers  = {}
 
-    def loadCSV(self, filename='WIKI_PRICES.csv', delimiter=','):
+    def loadCSV(self, daysPerTicker=1000000, startDate=None, filename='WIKI_PRICES.csv', delimiter=','):
         
         uTickers = {}
         with open(filename) as csv_file:
@@ -32,11 +32,11 @@ class Loader():
                 # Just for fast testing
                 #if i > 1 and len(line[0]) > 1:
                 #    break
-                #i += 1
-                #if i >= 1000000:
-                #    break
+                i += 1
+                if i >= 1000000:
+                    break
 
-        self.createTickers(uTickers)
+        self.createTickers(uTickers, daysPerTicker, startDate)
         
     @classmethod
     def loadPickle(self, filename):
@@ -47,17 +47,23 @@ class Loader():
         fileHandle = open(filename, 'wb')
         pickle.dump(self, fileHandle)
 
-    def createTickers(self, uTickers):
+    def createTickers(self, uTickers, daysPerTicker, startDateStr):
+
         d0 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
-        
+        if startDateStr != None:
+            ds          = datetime.strptime(startDateStr, '%Y-%m-%d').date()
+            startDate   = (ds - d0).days
+        else:
+            startDate = -1
+
         for ticker, data in uTickers.items():
             if ticker == 'ticker':
                 continue
 
             self.symbols.append(ticker)
-            self.tickers[ticker] = Ticker(ticker, data, d0)
+            self.tickers[ticker] = Ticker(ticker, data, d0, daysPerTicker, startDate)
 
-        self.save('allTickers.bin')
+        self.save('smallTickers' + startDate + '.bin')
 
     def processTickers(self, num, startDate):
 
@@ -76,7 +82,7 @@ class Loader():
         for idx in idxs:
             symbol  = self.symbols[idx]
             ticker  = self.tickers[symbol]
-            if ticker.startDate < startDateInt:
+            if ticker.startDate > startDateInt:
                 continue
 
             self.activeTickers[symbol] = ticker
