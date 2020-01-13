@@ -12,21 +12,33 @@ class Ticker():
         self.endDate    = 0
         self.csvToNp(data, epoch, maxDays, startDate)
 
+    @classmethod
+    def isViable(self, data, epoch, maxDays, startDate):
+        d0 = datetime.strptime(data[0][0], '%Y-%m-%d').date()
+        days = (d0 - epoch).days 
+        if days > startDate + maxDays:
+            return False
+        return True
 
     def csvToNp(self, data, epoch, maxDays, startDate): 
-        i       = 0
+        i       = -1
         array   = []
         prevRow = ''
-        started = False
+        started     = False
         for row in data:
+            i               += 1
             d1              = datetime.strptime(row[0], '%Y-%m-%d').date()
             dateInt         = (d1 - epoch).days
 
-            # Don't start recording data untill a start date, if one has been specified
+            # Don't start recording data until a start date, if one has been specified
+            # Don't grab tickers past the maxDate
+
+            if dateInt - startDate >= maxDays:
+                break
+
             if started:
                 pass
-            elif (started == False and dateInt == startDate) or startDate == None:
-                i               = 0
+            elif (started == False and dateInt >= startDate) or startDate == -1:
                 started         = True
                 self.startDate  = dateInt
             else:
@@ -52,15 +64,11 @@ class Ticker():
                 arow.append(float(v))
                 idx += 1
 
-            i+=1
             prevRow = row
             array.append(arow)
 
-            if i >= maxDays:
-                break
-        
         self.data       = array
-        self.endDate    = (datetime.strptime(self.data[-1][0], '%Y-%m-%d').date() - epoch).days
+        self.endDate    = self.data[-1][0]
 
         #pi2 = pickle.dumps(self)
         #s2 = sys.getsizeof(pi2)

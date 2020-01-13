@@ -16,7 +16,7 @@ class Loader():
         self.symbols        = []
         self.activeTickers  = {}
 
-    def loadCSV(self, daysPerTicker=1000000, startDate=None, filename='WIKI_PRICES.csv', delimiter=','):
+    def loadCSV(self, daysPerTicker=1000000, startDateStr='', filename='WIKI_PRICES.csv', delimiter=','):
         
         uTickers = {}
         with open(filename) as csv_file:
@@ -36,7 +36,7 @@ class Loader():
                 if i >= 1000000:
                     break
 
-        self.createTickers(uTickers, daysPerTicker, startDate)
+        self.createTickers(uTickers, daysPerTicker, startDateStr)
         
     @classmethod
     def loadPickle(self, filename):
@@ -50,20 +50,20 @@ class Loader():
     def createTickers(self, uTickers, daysPerTicker, startDateStr):
 
         d0 = datetime.strptime(self.epoch, '%Y-%m-%d').date()
-        if startDateStr != None:
+        if startDateStr != '':
             ds          = datetime.strptime(startDateStr, '%Y-%m-%d').date()
             startDate   = (ds - d0).days
         else:
             startDate = -1
 
         for ticker, data in uTickers.items():
-            if ticker == 'ticker':
+            if ticker == 'ticker' or Ticker.isViable(data, d0, daysPerTicker, startDate) == False:
                 continue
 
             self.symbols.append(ticker)
             self.tickers[ticker] = Ticker(ticker, data, d0, daysPerTicker, startDate)
 
-        self.save('smallTickers' + startDate + '.bin')
+        self.save('smallTickers' + startDateStr + '.bin')
 
     def processTickers(self, num, startDate):
 
@@ -82,8 +82,6 @@ class Loader():
         for idx in idxs:
             symbol  = self.symbols[idx]
             ticker  = self.tickers[symbol]
-            if ticker.startDate > startDateInt:
-                continue
 
             self.activeTickers[symbol] = ticker
             choosen += 1
