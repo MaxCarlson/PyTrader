@@ -9,11 +9,13 @@ class Simulation():
         self.idx        = 0
         self.tickerIdxs = {}    
         self.cash       = cash
+        self.benchCash  = cash
         self.date       = startDate
         self.startDate  = startDate
         self.epoch      = loader.epoch
         
-        self.normalizeTickerDates(loader)
+        #self.normalizeTickerDates(loader)
+        self.benchmarks = [BuyAndHold(), DCA()]
 
     def run(self):
         while self.step():
@@ -28,6 +30,7 @@ class Simulation():
 
         self.idx += 1
         self.checkDates()
+        self.updateBenchmarks()
         return running
 
     def processTicker(self, ticker):
@@ -38,6 +41,10 @@ class Simulation():
 
         return True
 
+
+    def updateBenchmarks(self):
+        for bench in self.benchmarks:
+            pass
 
     # Debugging tool
     def checkDates(self):

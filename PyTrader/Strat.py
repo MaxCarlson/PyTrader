@@ -9,6 +9,15 @@ class Strat():
         pass
 
 
+class BuyAndHold(Strat):
+    def __init__(self):
+        Strat.__init__(self)
+
+
+class DCA(Strat):
+    def __init__(self):
+        Strat.__init__(self)
+
 
 class MACDStrat(Strat):
 
