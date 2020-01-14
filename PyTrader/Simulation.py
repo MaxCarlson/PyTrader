@@ -15,7 +15,7 @@ class Simulation():
         self.epoch      = loader.epoch
         
         #self.normalizeTickerDates(loader)
-        self.benchmarks = [BuyAndHold(), DCA()]
+        self.benchmarks = [BuyAndHold(cash)]
 
     def run(self):
         while self.step():
