@@ -44,13 +44,13 @@ class Simulation():
         self.updateBenchmarks(inactiveTickers)
         return True
 
-    def updateStrats(self, inactive):
+    def updateStrats(self, inactives):
         for strat in self.strats:
             pass
 
-    def updateBenchmarks(self, inactive):
+    def updateBenchmarks(self, inactives):
         for bench in self.benchmarks:
-            bench.run(loader.tickers, self.idx)
+            bench.run(loader.tickers, inactives, self.idx)
 
     # Debugging tool
     def checkDates(self):

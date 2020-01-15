@@ -5,12 +5,13 @@ import sys
 
 class Ticker():
 
-    def __init__(self, name, data, epoch, maxDays, startDate):
+    def __init__(self, name, data, fields, epoch, maxDays, startDate):
         self.name       = name
         self.data       = np.array([])
         self.startDate  = 0
         self.endDate    = 0
-        self.csvToNp(data, epoch, maxDays, startDate)
+        self.fields     = fields
+        #self.csvToNp(data, epoch, maxDays, startDate)
 
     @classmethod
     def isViable(self, data, epoch, maxDays, startDate):
@@ -19,6 +20,9 @@ class Ticker():
         if days > startDate + maxDays:
             return False
         return True
+
+    def getData(self, field, dateIdx):
+        return self.data[dateIdx][self.fields[field]]
 
     def csvToNp(self, data, epoch, maxDays, startDate): 
         i       = -1

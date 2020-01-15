@@ -15,6 +15,7 @@ class Loader():
         self.tickers        = {} 
         self.symbols        = []
         self.activeTickers  = {}
+        self.fields         = {}
 
     def loadCSV(self, daysPerTicker=1000000, startDateStr='', filename='WIKI_PRICES.csv', delimiter=','):
         
@@ -57,11 +58,23 @@ class Loader():
             startDate = -1
 
         for ticker, data in uTickers.items():
-            if ticker == 'ticker' or Ticker.isViable(data, d0, daysPerTicker, startDate) == False:
+
+            # Fill out fields
+            if ticker == 'ticker': 
+                idx = 0
+                for field in data:
+                    self.fields[field] = idx
+                    idx += 1
                 continue
 
+            if Ticker.isViable(data, d0, daysPerTicker, startDate) == False:
+                continue
+
+            # Create ticker
             self.symbols.append(ticker)
-            self.tickers[ticker] = Ticker(ticker, data, d0, daysPerTicker, startDate)
+            t = Ticker(ticker, data, self.fields, d0, daysPerTicker, startDate)
+            t.csvToNp(data, d0, daysPerTicker, startDate)
+            self.tickers[ticker] = t
 
         self.save('smallTickers' + startDateStr + '.bin')
 
