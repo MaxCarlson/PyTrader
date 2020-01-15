@@ -7,7 +7,10 @@ class Strat():
         self.holdings   = {}
         self.capital    = capital
 
-    def run(self, stocks, close, day0, dayIdx):
+    def run(self, stocks, inactive, dayIdx):
+        pass
+
+    def sellInactiveTicker(self, inactiveTickers):
         pass
 
 
@@ -16,7 +19,7 @@ class BuyAndHold(Strat):
     def __init__(self, capital):
         Strat.__init__(self, 0)
 
-    def run(self, stocks, close, day0, dayIdx):
+    def run(self, stocks, inactive, dayIdx):
         if day != 0:
             return
 
@@ -25,7 +28,7 @@ class DCA(Strat):
     def __init__(self):
         Strat.__init__(self)
 
-    def run(self, stocks, close, day0, dayIdx):
+    def run(self, stocks, inactive, dayIdx):
         pass
 
 
@@ -47,7 +50,7 @@ class MACDStrat(Strat):
         Strat.__init__(self, long)
         self.macds = {}
 
-    def run(self, stocks, close, day0, dayIdx):
+    def run(self, stocks, inactive, dayIdx):
         for stock in stocks:
             if day == 0:
 

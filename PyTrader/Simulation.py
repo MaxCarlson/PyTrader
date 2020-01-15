@@ -15,6 +15,7 @@ class Simulation():
         self.epoch      = loader.epoch
         
         #self.normalizeTickerDates(loader)
+        self.strats     = []
         self.benchmarks = [BuyAndHold(cash)]
 
     def run(self):
@@ -23,28 +24,33 @@ class Simulation():
         
     def step(self):
         
-        running = False
+        running         = False
+        inactiveTickers = {}
+
         for symbol in loader.activeTickers:
             ticker = loader.tickers[symbol]
-            running |= self.processTicker(ticker)
+            if self.idx >= len(ticker.data): 
+                inactiveTickers[symbol]
+                continue
+
+            running = True
+
+        if running == False:
+            return False
 
         self.idx += 1
         self.checkDates()
-        self.updateBenchmarks()
-        return running
-
-    def processTicker(self, ticker):
-        if self.idx >= len(ticker.data): 
-            return False
-        curDate = ticker.data[self.idx][0]
-
-
+        self.updateStrats(inactiveTickers)
+        self.updateBenchmarks(inactiveTickers)
         return True
 
-
-    def updateBenchmarks(self):
-        for bench in self.benchmarks:
+    def updateStrats(self, inactive):
+        for strat in self.strats:
             pass
+
+    def updateBenchmarks(self, inactive):
+        for bench in self.benchmarks:
+            bench.run(loader.tickers, self.idx)
 
     # Debugging tool
     def checkDates(self):
