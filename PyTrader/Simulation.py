@@ -13,6 +13,7 @@ class Simulation():
         self.date       = startDate
         self.startDate  = startDate
         self.epoch      = loader.epoch
+        self.inactiveSymbols = {}
         
         #self.normalizeTickerDates(loader)
         self.strats     = []
@@ -21,16 +22,20 @@ class Simulation():
     def run(self, loader):
         while self.step(loader):
             pass
+        self.printReturns()
+
+        a = 5
         
     def step(self, loader):
         
         running         = False
-        inactiveTickers = {}
-
+        newlyInactives  = {}
         for symbol in loader.activeTickers:
+            if symbol in self.inactiveSymbols:
+                continue
             ticker = loader.tickers[symbol]
             if self.idx >= len(ticker.data): 
-                inactiveTickers[symbol]
+                newlyInactives[symbol] = ticker
                 continue
 
             running = True
@@ -39,9 +44,10 @@ class Simulation():
             return False
 
         self.checkDates(loader)
-        self.updateStrats(loader, inactiveTickers)
-        self.updateBenchmarks(loader, inactiveTickers)
+        self.updateStrats(loader, newlyInactives)
+        self.updateBenchmarks(loader, newlyInactives)
         self.idx += 1
+        self.inactiveSymbols.update(newlyInactives)
         return True
 
     def updateStrats(self, loader, inactives):
@@ -64,13 +70,9 @@ class Simulation():
             if prevDate != None and curDate != prevDate:
                 raise RuntimeError("Dates between tickers do NOT match!")
 
-    def normalizeTickerDates(self, loader):
-        #de      = datetime.strptime(self.epoch,     '%Y-%m-%d').date()
-        #d0      = datetime.strptime(self.startDate, '%Y-%m-%d').date()
-        #bDays   = (d0 - de).days
-        #for symbol in loader.activeTickers:
-        #    ticker = loader.tickers[symbol]
-        #    a = 5
-        pass
+    def printReturns(self):
+        print("Benchmarks: ")
+        for bench in self.benchmarks:
+            print(type(bench).__name__, bench.percentReturn(), '%\n')
 
 

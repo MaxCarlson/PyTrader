@@ -4,7 +4,7 @@ class Strat():
 
     def __init__(self, minDays, capital):
         self.minDays        = minDays # Minimum number of days that must be run before applying Strat
-        self.holdings       = {}
+        self.assets       = {}
         self.capital        = capital
         self.principal      = capital
         self.dailyReturns   = []
@@ -15,14 +15,24 @@ class Strat():
     def run(self, stocks, inactives, dayIdx):
         pass
 
-    def getReturn(self):
-        pass
+    def percentReturn(self):
+        percent = sum([a.percentReturn for key, a in self.assets.items()])
+        percent /= len(self.assets)
+        return percent
 
-    def sellInactiveTicker(self, stocks, inactives, dayIdx):
+    def purchase(self, symbol, ticker, num, dayIdx):
+        adjClose    = ticker.getData('adj_close', dayIdx)
+        asset       = Asset()
+        netCost     = asset.increasePosition(num, adjClose)
+        self.assets[symbol] = asset
+        self.capital -= netCost
+
+    # If we have no more data for a stock, sell it off
+    def sellInactives(self, stocks, inactives, dayIdx):
         sold = False
         for inactive in inactives:
-            price = stocks[inactive].getData('adjClose', dayIdx - 1)
-            asset = self.holdings[inactive]
+            price = stocks[inactive].getData('adj_close', dayIdx - 1)
+            asset = self.assets[inactive]
             
             if asset.size(): 
                 sold = True
@@ -34,27 +44,26 @@ class Strat():
 
 # Simulate and Index fund of all the stocks in our backtest
 # Equal distribution of assets across all stocks
+# TODO: Inactive tickers will skew the overall results downwards since
+# percent return is calculated by summing all returns and averaging them
 class BuyAndHold(Strat):
 
     def __init__(self, capital, fee = 0):
         Strat.__init__(self, 0, capital)
 
     def run(self, stocks, inactives, dayIdx):
+        if len(inactives) > 0:
+            self.sellInactives(stocks, inactives, dayIdx)
+
         if dayIdx == 0:
             self.firstDay(stocks, inactives, dayIdx)
 
     def firstDay(self, stocks, inactives, dayIdx):
-        if len(inactives) > 0:
-            self.sellInactiveTicker(stocks, inactives, dayIdx)
-
+        self.capital = 0
         for symbol, ticker in stocks.items():
-                adjClose = ticker.getData('adj_close', dayIdx)
-                asset = Asset()
-                asset.increasePosition(1, adjClose)
-                self.holdings[symbol] = asset
-
-    def getReturn(self):
-        pass
+            self.purchase(symbol, ticker, 1, dayIdx)
+        self.capital = -self.capital
+                
 
 
 
