@@ -1,6 +1,7 @@
 
 
 class Asset():
+    ALL = -1
 
     def __init__(self):
         self.avgBuyPrice    = 0
@@ -16,7 +17,7 @@ class Asset():
 
     def increasePosition(self, numPurchased, price):
         self.avgBuyPrice    = (self.totalPurchased * self.avgBuyPrice + numPurchased * price) / (self.totalPurchased + numPurchased)
-        self.totalPurchased += num
+        self.totalPurchased += numPurchased
 
     def decreasePosition(self, numToSell, price, slippage = 0): # TODO: Slippage
         self.avgSellPrice   = (self.totalSold * self.avgSellPrice + numToSell * price) / (self.totalSold + numToSell)

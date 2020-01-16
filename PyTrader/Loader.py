@@ -40,11 +40,12 @@ class Loader():
         self.createTickers(uTickers, daysPerTicker, startDateStr)
         
     @classmethod
-    def loadPickle(self, filename):
-        with open(filename, 'rb') as pickleFile:
+    def loadPickle(self, filename, extension = '.bin'):
+        with open(filename + extension, 'rb') as pickleFile:
             return pickle.load(pickleFile)
 
-    def save(self, filename):
+    def save(self, filename, extension = '.bin'):
+        filename += extension
         fileHandle = open(filename, 'wb')
         pickle.dump(self, fileHandle)
 
@@ -62,7 +63,7 @@ class Loader():
             # Fill out fields
             if ticker == 'ticker': 
                 idx = 0
-                for field in data:
+                for field in data[0]:
                     self.fields[field] = idx
                     idx += 1
                 continue
@@ -75,8 +76,6 @@ class Loader():
             t = Ticker(ticker, data, self.fields, d0, daysPerTicker, startDate)
             t.csvToNp(data, d0, daysPerTicker, startDate)
             self.tickers[ticker] = t
-
-        self.save('smallTickers' + startDateStr + '.bin')
 
     def processTickers(self, num, startDate):
 

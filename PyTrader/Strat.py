@@ -6,6 +6,7 @@ class Strat():
         self.minDays        = minDays # Minimum number of days that must be run before applying Strat
         self.holdings       = {}
         self.capital        = capital
+        self.principal      = capital
         self.dailyReturns   = []
 
     def initialize(self):
@@ -20,14 +21,15 @@ class Strat():
     def sellInactiveTicker(self, stocks, inactives, dayIdx):
         sold = False
         for inactive in inactives:
-            shares  = self.holdings.get(inactive, 0)
-            price   = stocks[inactive].getData('adjClose', dayIdx - 1)
-            if shares:
+            price = stocks[inactive].getData('adjClose', dayIdx - 1)
+            asset = self.holdings[inactive]
+            
+            if asset.size(): 
                 sold = True
+            asset.decreasePosition(asset.size(), price)
+        self.capital += asset.totalReturn
 
-            capital += shares * price
-            self.holdings[inactive] = 0
-        return sold
+
 
 
 # Simulate and Index fund of all the stocks in our backtest
@@ -42,12 +44,14 @@ class BuyAndHold(Strat):
             self.firstDay(stocks, inactives, dayIdx)
 
     def firstDay(self, stocks, inactives, dayIdx):
-        for ticker in stocks:
-                avgClose = ticker.getData('adj_close', dayIdx)
-                asset = Asset()
-                asset.increasePosition(1, avgClose)
-                self.holdings[ticker.name] = asset
+        if len(inactives) > 0:
+            self.sellInactiveTicker(stocks, inactives, dayIdx)
 
+        for symbol, ticker in stocks.items():
+                adjClose = ticker.getData('adj_close', dayIdx)
+                asset = Asset()
+                asset.increasePosition(1, adjClose)
+                self.holdings[symbol] = asset
 
     def getReturn(self):
         pass
