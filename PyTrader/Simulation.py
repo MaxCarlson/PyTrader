@@ -1,6 +1,6 @@
 from datetime import datetime
-from Strat import *
-from Loader import *
+from Strat import Strat, BuyAndHold
+from Loader import Loader
 
 
 class Simulation():
@@ -18,11 +18,11 @@ class Simulation():
         self.strats     = []
         self.benchmarks = [BuyAndHold(cash)]
 
-    def run(self):
-        while self.step():
+    def run(self, loader):
+        while self.step(loader):
             pass
         
-    def step(self):
+    def step(self, loader):
         
         running         = False
         inactiveTickers = {}
@@ -38,22 +38,22 @@ class Simulation():
         if running == False:
             return False
 
+        self.checkDates(loader)
+        self.updateStrats(loader, inactiveTickers)
+        self.updateBenchmarks(loader, inactiveTickers)
         self.idx += 1
-        self.checkDates()
-        self.updateStrats(inactiveTickers)
-        self.updateBenchmarks(inactiveTickers)
         return True
 
-    def updateStrats(self, inactives):
+    def updateStrats(self, loader, inactives):
         for strat in self.strats:
             pass
 
-    def updateBenchmarks(self, inactives):
+    def updateBenchmarks(self, loader, inactives):
         for bench in self.benchmarks:
             bench.run(loader.tickers, inactives, self.idx)
 
     # Debugging tool
-    def checkDates(self):
+    def checkDates(self, loader):
         prevDate = None
         for symbol in loader.activeTickers:
             ticker  = loader.tickers[symbol]

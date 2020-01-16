@@ -1,11 +1,12 @@
-
+from Asset import Asset
 
 class Strat():
 
     def __init__(self, minDays, capital):
-        self.minDays    = minDays # Minimum number of days that must be run before applying Strat
-        self.holdings   = {}
-        self.capital    = capital
+        self.minDays        = minDays # Minimum number of days that must be run before applying Strat
+        self.holdings       = {}
+        self.capital        = capital
+        self.dailyReturns   = []
 
     def initialize(self):
         pass
@@ -29,14 +30,24 @@ class Strat():
         return sold
 
 
+# Simulate and Index fund of all the stocks in our backtest
+# Equal distribution of assets across all stocks
 class BuyAndHold(Strat):
 
-    def __init__(self, capital):
+    def __init__(self, capital, fee = 0):
         Strat.__init__(self, 0, capital)
 
     def run(self, stocks, inactives, dayIdx):
+        if dayIdx == 0:
+            self.firstDay(stocks, inactives, dayIdx)
 
-        pass
+    def firstDay(self, stocks, inactives, dayIdx):
+        for ticker in stocks:
+                avgClose = ticker.getData('adj_close', dayIdx)
+                asset = Asset()
+                asset.increasePosition(1, avgClose)
+                self.holdings[ticker.name] = asset
+
 
     def getReturn(self):
         pass
@@ -73,5 +84,5 @@ class MACDStrat(Strat):
     def run(self, stocks, inactives, dayIdx):
         for stock in stocks:
             if day == 0:
-
+                pass
 

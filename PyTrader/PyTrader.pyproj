@@ -22,6 +22,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Loader.py" />
+    <Compile Include="Asset.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="PyTrader.py" />
     <Compile Include="Simulation.py">
       <SubType>Code</SubType>

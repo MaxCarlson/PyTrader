@@ -2,7 +2,7 @@ import csv
 import random
 import pickle
 import numpy as np
-from Ticker import *
+from Ticker import Ticker
 from datetime import datetime
 
 import sys
