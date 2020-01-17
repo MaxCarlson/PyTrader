@@ -4,7 +4,7 @@ class Strat():
 
     def __init__(self, minDays, capital):
         self.minDays        = minDays # Minimum number of days that must be run before applying Strat
-        self.assets       = {}
+        self.assets         = {}
         self.capital        = capital
         self.principal      = capital
         self.dailyReturns   = []
@@ -26,6 +26,9 @@ class Strat():
         netCost     = asset.increasePosition(num, adjClose)
         self.assets[symbol] = asset
         self.capital -= netCost
+
+    def sellAllHoldings(self, stocks, dayIdx):
+        self.sellInactives(stocks, [key for key, a in self.assets.items()], dayIdx)
 
     # If we have no more data for a stock, sell it off
     def sellInactives(self, stocks, inactives, dayIdx):

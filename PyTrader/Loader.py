@@ -33,9 +33,9 @@ class Loader():
                 # Just for fast testing
                 #if i > 1 and len(line[0]) > 1:
                 #    break
-                i += 1
-                if i >= 1000000:
-                    break
+                #i += 1
+                #if i >= 1000000:
+                #    break
 
         self.createTickers(uTickers, daysPerTicker, startDateStr)
         

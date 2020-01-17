@@ -40,15 +40,14 @@ class Simulation():
 
             running = True
 
-        if running == False:
-            return False
 
-        self.checkDates(loader)
+        #self.checkDates(loader) # debugging
+        
         self.updateStrats(loader, newlyInactives)
         self.updateBenchmarks(loader, newlyInactives)
         self.idx += 1
         self.inactiveSymbols.update(newlyInactives)
-        return True
+        return running
 
     def updateStrats(self, loader, inactives):
         for strat in self.strats:
