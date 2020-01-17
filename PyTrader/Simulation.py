@@ -1,8 +1,9 @@
 from datetime import datetime
-from Strat import Strat, BuyAndHold
+from Strat import Strat, BuyAndHold, MACDStrat
 from Loader import Loader
 
-
+# TODO: Date needs to be handled better and made into a human readable format
+# Also have to add in the concept of proper weeks/months
 class Simulation():
 
     def __init__(self, loader, startDate, cash):
@@ -16,7 +17,7 @@ class Simulation():
         self.inactiveSymbols = {}
         
         #self.normalizeTickerDates(loader)
-        self.strats     = []
+        self.strats     = [MACDStrat(cash)]
         self.benchmarks = [BuyAndHold(cash)]
 
     def run(self, loader):
@@ -51,10 +52,14 @@ class Simulation():
 
     def updateStrats(self, loader, inactives):
         for strat in self.strats:
-            pass
+            if self.idx == 0:
+                strat.initialize(loader.tickers, self.idx)
+            strat.run(loader.tickers, inactives, self.idx)
 
     def updateBenchmarks(self, loader, inactives):
         for bench in self.benchmarks:
+            if self.idx == 0:
+                bench.initialize(loader.tickers, self.idx)
             bench.run(loader.tickers, inactives, self.idx)
 
     # Debugging tool
