@@ -36,7 +36,7 @@ class Simulation():
             if symbol in self.inactiveSymbols:
                 continue
             ticker = loader.tickers[symbol]
-            if self.idx >= len(ticker.data): # TODO: This is broken!!!!
+            if self.idx >= len(ticker.data): # TODO: This is broken!!!
                 newlyInactives[symbol] = ticker 
                 continue
 
