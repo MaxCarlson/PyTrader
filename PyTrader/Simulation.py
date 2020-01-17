@@ -8,6 +8,7 @@ class Simulation():
 
     def __init__(self, loader, startDate, cash):
         self.idx        = 0
+        self.start      = False
         self.tickerIdxs = {}    
         self.cash       = cash
         self.benchCash  = cash
@@ -35,32 +36,49 @@ class Simulation():
             if symbol in self.inactiveSymbols:
                 continue
             ticker = loader.tickers[symbol]
-            if self.idx >= len(ticker.data): 
-                newlyInactives[symbol] = ticker
+            if self.idx >= len(ticker.data): # TODO: This is broken!!!!
+                newlyInactives[symbol] = ticker 
                 continue
 
             running = True
 
-
+        # Innactive dead symbols and see if 
+        # we can start our sim if it hasn't already started
         #self.checkDates(loader) # debugging
+        self.inactiveSymbols.update(newlyInactives)
+        self.startSim(loader)
         
         self.updateStrats(loader, newlyInactives)
         self.updateBenchmarks(loader, newlyInactives)
         self.idx += 1
-        self.inactiveSymbols.update(newlyInactives)
         return running
+
+    # Are we ready to start?
+    def startSim(self, loader):
+        if self.start: return
+
+        self.start = True
+        for strat in self.strats:
+            self.start &= self.idx >= strat.minDays - 1
+        if self.start:
+            for strat in self.strats:       strat.dayZero(loader.tickers, self.inactiveSymbols, self.idx)
+            for bench in self.benchmarks:   bench.dayZero(loader.tickers, self.inactiveSymbols, self.idx)
 
     def updateStrats(self, loader, inactives):
         for strat in self.strats:
             if self.idx == 0:
                 strat.initialize(loader.tickers, self.idx)
-            strat.run(loader.tickers, inactives, self.idx)
+            if self.start:
+                strat.run(loader.tickers, inactives, self.idx)
+            else:
+                Strat.run(strat, loader.tickers, inactives, self.idx)
 
     def updateBenchmarks(self, loader, inactives):
         for bench in self.benchmarks:
             if self.idx == 0:
                 bench.initialize(loader.tickers, self.idx)
-            bench.run(loader.tickers, inactives, self.idx)
+            if self.start:
+                bench.run(loader.tickers, inactives, self.idx)
 
     # Debugging tool
     def checkDates(self, loader):

@@ -14,7 +14,12 @@ class Strat():
         self.dailyReturns   = [] if dailies   else None
         self.monthlyReturns = [] if monthlies else None
 
+    # Run on the first data point day we have
     def initialize(self, stocks, dayIdx):
+        pass
+
+    # Run on the first simulation day
+    def dayZero(self, stocks, inactives, dayIdx):
         pass
 
     def run(self, stocks, inactives, dayIdx):
@@ -42,13 +47,14 @@ class Strat():
 
         sold = False
         for inactive in inactives:
+            asset = self.assets.get(inactive)
+            if not asset: continue
+
             price = stocks[inactive].getData('adj_close', dayIdx - 1)
-            asset = self.assets[inactive]
-            
             if asset.size(): 
                 sold = True
             asset.decreasePosition(asset.size(), price)
-        self.capital += asset.totalReturn
+            self.capital += asset.totalReturn
 
 
 # Simulate an Index fund of all the stocks in our backtest
@@ -64,9 +70,10 @@ class BuyAndHold(Strat):
     def run(self, stocks, inactives, dayIdx):
         Strat.run(self, stocks, inactives, dayIdx)
 
-    def initialize(self, stocks, dayIdx):
+    def dayZero(self, stocks, inactives, dayIdx):
         self.capital = 0
         for symbol, ticker in stocks.items():
+            if symbol in inactives: continue
             self.purchase(symbol, ticker, 1, dayIdx)
         self.capital = -self.capital
     
