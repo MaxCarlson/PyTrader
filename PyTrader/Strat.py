@@ -1,13 +1,15 @@
 from Asset import Asset
+import pandas as pd
 
 class Strat():
 
-    def __init__(self, minDays, capital):
-        self.minDays        = minDays # Minimum number of days that must be run before applying Strat
+    def __init__(self, minDays, capital, dailies = None, monthlies = None):
         self.assets         = {}
+        self.minDays        = minDays # Minimum number of days that must be run before applying Strat
         self.capital        = capital
         self.principal      = capital
-        self.dailyReturns   = []
+        self.dailyReturns   = [] if dailies   else None
+        self.monthlyReturns = [] if monthlies else None
 
     def initialize(self):
         pass
@@ -16,14 +18,15 @@ class Strat():
         pass
 
     def percentReturn(self):
-        percent = sum([a.percentReturn for key, a in self.assets.items()])
-        percent /= len(self.assets)
-        return percent
+        return 0 # TODO
 
-    def purchase(self, symbol, ticker, num, dayIdx):
-        adjClose    = ticker.getData('adj_close', dayIdx)
-        asset       = Asset()
-        netCost     = asset.increasePosition(num, adjClose)
+    def purchase(self, symbol, ticker, num, dayIdx, field = 'adj_close'):
+        price   = ticker.getData(field, dayIdx)
+        asset   = self.assets.get(symbol, None)
+        if not asset: 
+            asset = Asset()
+        
+        netCost = asset.increasePosition(num, price)
         self.assets[symbol] = asset
         self.capital -= netCost
 
@@ -66,10 +69,13 @@ class BuyAndHold(Strat):
         for symbol, ticker in stocks.items():
             self.purchase(symbol, ticker, 1, dayIdx)
         self.capital = -self.capital
+    
+    def percentReturn(self):
+        percent = sum([a.percentReturn for key, a in self.assets.items()])
+        percent /= len(self.assets)
+        return percent
+
                 
-
-
-
 
 class DCA(Strat):
     def __init__(self):
