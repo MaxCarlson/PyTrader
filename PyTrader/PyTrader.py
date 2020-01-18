@@ -10,12 +10,12 @@ fullFileName    = filename + startDate + '_' + str(numYears)
 
 def main():
 
-    loader = Loader.loadPickle(fullFileName)
+    #loader = Loader.loadPickle(fullFileName)
 
-    #loader = Loader()
-    #loader.loadCSV(numDays, startDate)
-    #loader.processTickers(500, startDate)
-    #loader.save(fullFileName)
+    loader = Loader()
+    loader.loadCSV(numDays, startDate)
+    loader.processTickers(500, startDate)
+    loader.save(fullFileName)
 
     sim = Simulation(loader, adjStartDate, 20000)
     sim.run(loader)

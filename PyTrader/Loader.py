@@ -2,6 +2,7 @@ import csv
 import random
 import pickle
 import numpy as np
+import pandas as pd
 from Ticker import Ticker
 from datetime import datetime
 
@@ -18,24 +19,16 @@ class Loader():
         self.fields         = {}
 
     def loadCSV(self, daysPerTicker=1000000, startDateStr='', filename='WIKI_PRICES.csv', delimiter=','):
-        
-        uTickers = {}
-        with open(filename) as csv_file:
-            i = 0
-            csvReader = csv.reader(csv_file, delimiter=delimiter)
-            for line in csvReader:
-
-                if line[0] in uTickers:
-                    uTickers[line[0]].append(line[1:])
-                else:
-                    uTickers[line[0]] = [line[1:]]
-                
-                # Just for fast testing
-                #if i > 1 and len(line[0]) > 1:
-                #    break
-                #i += 1
-                #if i >= 1000000:
-                #    break
+        idx = -1
+        df  = pd.read_csv(filename)
+        prevTicker = None
+        for ticker in df['ticker']:
+            idx += 1
+            if not prevTicker: prevTicker = ticker
+            if ticker == prevTicker:
+                continue
+            dfTicker    = df[0:idx-1]
+            prevTicker  = ticker
 
         self.createTickers(uTickers, daysPerTicker, startDateStr)
         
