@@ -7,14 +7,15 @@ startDate       = '2000-1-1'
 adjStartDate    = '2000-3-1'
 filename        = '500Tickers'
 fullFileName    = filename + startDate + '_' + str(numYears)
+fileToLoad      = 'WIKI_PRICES.csv'
 
 def main():
 
     #loader = Loader.loadPickle(fullFileName)
 
     loader = Loader()
-    loader.loadCSV(numDays, startDate)
-    loader.processTickers(500, startDate)
+    loader.loadCSV(startDate, numDays, fileToLoad)
+    loader.processTickers(numDays, startDate)
     loader.save(fullFileName)
 
     sim = Simulation(loader, adjStartDate, 20000)

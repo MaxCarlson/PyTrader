@@ -5,30 +5,34 @@ import numpy as np
 import pandas as pd
 from Ticker import Ticker
 from datetime import datetime
-
-import sys
+from DateHandler import DateHandler
 
 class Loader():
         
     
     def __init__(self):
         self.epoch          = '1970-1-1'
+        self.dateHandler    = DateHandler(self.epoch, 'days')
         self.tickers        = {} 
         self.symbols        = []
         self.activeTickers  = {}
         self.fields         = {}
 
-    def loadCSV(self, daysPerTicker=1000000, startDateStr='', filename='WIKI_PRICES.csv', delimiter=','):
+    def loadCSV(self, startDate='', daysPerTicker=1000000, filename='', delimiter=','):
         idx = -1
         df  = pd.read_csv(filename)
-        prevTicker = None
-        for ticker in df['ticker']:
+        prevSymbol = None
+        for symbol in df['ticker']:
             idx += 1
-            if not prevTicker: prevTicker = ticker
-            if ticker == prevTicker:
-                continue
+            if not prevSymbol:          prevSymbol = symbol
+            if symbol == prevSymbol:    continue
+
             dfTicker    = df[0:idx-1]
-            prevTicker  = ticker
+            ticker      = Ticker(prevSymbol, dfTicker, self.fields, startDate)
+            if not ticker.isViable(self.dateHandler, daysPerTicker, startDate):
+                continue
+            self.tickers[prevSymbol] = ticker
+            prevSymbol = symbol
 
         self.createTickers(uTickers, daysPerTicker, startDateStr)
         

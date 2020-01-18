@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DateHandler.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Loader.py" />
     <Compile Include="Asset.py">
       <SubType>Code</SubType>

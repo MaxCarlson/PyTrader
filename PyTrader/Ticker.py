@@ -3,24 +3,21 @@ import numpy as np
 import pandas as pd
 import pickle
 import sys
+import DateHandler as DateHandler
 
 class Ticker():
 
-    def __init__(self, name, data, fields, epoch, maxDays, startDate):
+    def __init__(self, name, data, fields, startDate):
         self.name       = name
-        self.data       = np.array([])
+        self.data       = data
         self.startDate  = 0
         self.endDate    = 0
         self.fields     = fields
-        #self.csvToNp(data, epoch, maxDays, startDate)
 
-    @classmethod
-    def isViable(self, data, epoch, maxDays, startDate):
-        d0 = datetime.strptime(data[0][0], '%Y-%m-%d').date()
-        days = (d0 - epoch).days 
-        if days > startDate + maxDays:
-            return False
-        return True
+    def isViable(self, dateHandler, maxDays, startDate):
+        before  = dateHandler.onBefore(self.data.ix[0, 0])
+        after   = dateHandler.onAfter(self.data[-1][0])
+        return before and after
 
     def getData(self, field, dateIdx):
         return self.data[dateIdx][self.fields[field]]
