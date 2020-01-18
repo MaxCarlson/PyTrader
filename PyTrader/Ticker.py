@@ -1,5 +1,6 @@
 from datetime import datetime
 import numpy as np
+import pandas as pd
 import pickle
 import sys
 
@@ -23,6 +24,10 @@ class Ticker():
 
     def getData(self, field, dateIdx):
         return self.data[dateIdx][self.fields[field]]
+
+    def getDataPeriod(self, field, start, end):
+        dat = self.data[start:end, self.fields[field]:]
+        return  dat
 
     def csvToNp(self, data, epoch, maxDays, startDate): 
         i       = -1

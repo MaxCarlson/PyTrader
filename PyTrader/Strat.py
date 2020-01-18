@@ -67,15 +67,15 @@ class BuyAndHold(Strat):
     def __init__(self, capital):
         Strat.__init__(self, 0, capital)
 
-    def run(self, stocks, inactives, dayIdx):
-        Strat.run(self, stocks, inactives, dayIdx)
-
     def dayZero(self, stocks, inactives, dayIdx):
         self.capital = 0
         for symbol, ticker in stocks.items():
             if symbol in inactives: continue
             self.purchase(symbol, ticker, 1, dayIdx)
         self.capital = -self.capital
+
+    def run(self, stocks, inactives, dayIdx):
+        Strat.run(self, stocks, inactives, dayIdx)
     
     def percentReturn(self):
         percent = sum([a.percentReturn for key, a in self.assets.items()])
@@ -94,9 +94,17 @@ class DCA(Strat):
 
 class MACDStrat(Strat):
     class MACD():
-        def __init__(self):
+        def __init__(self, prices, short, long):
             self.emaLong  = 0
             self.emaShort = 0
+
+            # Calcualte simple SMA to start out
+            for i in range(0, len(prices)):
+                self.emaLong += prices[i]
+                if i < short:
+                    self.emaShort += prices[i]
+            self.emaLong    /= long
+            self.emaShort   /= short
 
         def update(self, close, shortSmoothing, longSmoothing):
             self.emaLong  = (close - self.emaLong)  * longSmoothing  + self.emaLong
@@ -110,14 +118,17 @@ class MACDStrat(Strat):
         self.longSmoothing  = 2 / (self.longPeriod + 1)
         self.shortSmoothing = 2 / (self.shortPeriod + 1)
 
-    def initialize(self, stocks, dayIdx):
+    def dayZero(self, stocks, inactives, dayIdx):
         for symbol, ticker in stocks.items():
-            macd = self.MACD()
+            prices  = ticker.getDataPeriod('adj_close', dayIdx - self.longPeriod + 1, dayIdx)
+            macd    = self.MACD(prices, self.shortPeriod, self.longPeriod)
             self.macds[symbol] = macd
             macd.update(ticker.getData('adj_close', dayIdx), self.shortSmoothing, self.longSmoothing)
-            
+          
     def run(self, stocks, inactives, dayIdx):
         Strat.run(self, stocks, inactives, dayIdx)
+        for inactive in inactives:
+            del self.macds[inactive]
 
         for symbol, macd in self.macds.items():
             ticker = stocks.get(symbol)
