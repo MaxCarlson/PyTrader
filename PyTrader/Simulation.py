@@ -6,15 +6,14 @@ from Loader import Loader
 # Also have to add in the concept of proper weeks/months
 class Simulation():
 
-    def __init__(self, loader, startDate, cash):
-        self.idx        = 0
-        self.start      = False
-        self.tickerIdxs = {}    
-        self.cash       = cash
-        self.benchCash  = cash
-        self.date       = startDate
-        self.startDate  = startDate
-        self.epoch      = loader.epoch
+    def __init__(self, loader, dateHandler, startDate, cash):
+        self.idx            = 0
+        self.start          = False
+        self.tickerIdxs     = {}    
+        self.cash           = cash
+        self.benchCash      = cash
+        self.startDate      = startDate
+        self.dateHandler    = dateHandler
         self.inactiveSymbols = {}
         
         #self.normalizeTickerDates(loader)
@@ -30,10 +29,10 @@ class Simulation():
  
         running         = False
         newlyInactives  = {}
-        for symbol in loader.activeTickers:
+        for symbol in loader.tickers:
             if symbol in self.inactiveSymbols:
                 continue
-            ticker = loader.activeTickers[symbol]
+            ticker = loader.tickers[symbol]
             if self.idx >= len(ticker.data): # TODO: This is broken!!!
                 newlyInactives[symbol] = ticker 
                 continue
@@ -46,8 +45,8 @@ class Simulation():
         self.inactiveSymbols.update(newlyInactives)
         self.startSim(loader)
         
-        self.updateStrats(loader, newlyInactives)
-        self.updateBenchmarks(loader, newlyInactives)
+        self.updateStrats(loader, self.strats, newlyInactives)
+        self.updateStrats(loader, self.benchmarks, newlyInactives)
         self.idx += 1
         return running
 
@@ -59,32 +58,26 @@ class Simulation():
         for strat in self.strats:
             self.start &= self.idx >= strat.minDays - 1
         if self.start:
-            for strat in self.strats:       strat.dayZero(loader.activeTickers, self.inactiveSymbols, self.idx)
-            for bench in self.benchmarks:   bench.dayZero(loader.activeTickers, self.inactiveSymbols, self.idx)
+            for strat in self.strats:       strat.dayZero(loader.tickers, self.inactiveSymbols, self.idx)
+            for bench in self.benchmarks:   bench.dayZero(loader.tickers, self.inactiveSymbols, self.idx)
 
-    def updateStrats(self, loader, inactives):
-        for strat in self.strats:
+    def updateStrats(self, loader, strats, inactives):
+        for strat in strats:
             if self.idx == 0:
-                strat.initialize(loader.activeTickers, self.idx)
+                strat.initialize(loader.tickers, self.idx)
             if self.start:
-                strat.run(loader.activeTickers, inactives, self.idx)
+                strat.run(loader.tickers, inactives, self.idx)
             else:
-                Strat.run(strat, loader.activeTickers, inactives, self.idx)
+                Strat.run(strat, loader.tickers, inactives, self.idx)
 
     def updateBenchmarks(self, loader, inactives):
-        for bench in self.benchmarks:
-            if self.idx == 0:
-                bench.initialize(loader.activeTickers, self.idx)
-            if self.start:
-                bench.run(loader.activeTickers, inactives, self.idx)
-            else:
-                Strat.run(bench, loader.activeTickers, inactives, self.idx)
+        pass
 
     # Debugging tool
     def checkDates(self, loader):
         prevDate = None
-        for symbol in loader.activeTickers:
-            ticker  = loader.activeTickers[symbol]
+        for symbol in loader.tickers:
+            ticker  = loader.tickers[symbol]
             if self.idx >= len(ticker.data): 
                 continue
 

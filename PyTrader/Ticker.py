@@ -15,15 +15,15 @@ class Ticker():
         self.fields     = fields
 
     def isViable(self, dateHandler, maxDays, startDate):
-        before  = dateHandler.onBefore(self.data.ix[0, 0])
-        after   = dateHandler.onAfter(self.data[-1][0])
-        return before and after
+        before  = dateHandler.isAfter(self.data.iat[0, 0])
+        wrange  = dateHandler.withinRange(self.data.iat[0, 0], self.data.iat[-1, 0], maxDays)
+        return before and wrange
 
     def getData(self, field, dateIdx):
-        return self.data[dateIdx][self.fields[field]]
+        return self.data.at[dateIdx, field]
 
     def getDataPeriod(self, field, start, end):
-        dat = self.data[start:end, self.fields[field]:]
+        dat = self.data.loc[start:end, field]
         return  dat
 
     def csvToNp(self, data, epoch, maxDays, startDate): 

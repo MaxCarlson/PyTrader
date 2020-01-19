@@ -1,5 +1,6 @@
 from Loader import Loader
 from Simulation import Simulation
+from DateHandler import DateHandler
 
 numYears        = 5
 numDays         = (365 - 52 * 2) * numYears
@@ -11,14 +12,16 @@ fileToLoad      = 'WIKI_PRICES.csv'
 
 def main():
 
+    dateHandler = DateHandler()
+
     #loader = Loader.loadPickle(fullFileName)
 
-    loader = Loader()
+    loader = Loader(dateHandler)
     loader.loadCSV(startDate, numDays, fileToLoad)
-    loader.processTickers(numDays, startDate)
+    #loader.processTickers(numDays, startDate)
     loader.save(fullFileName)
 
-    sim = Simulation(loader, adjStartDate, 20000)
+    sim = Simulation(loader, dateHandler, adjStartDate, 20000)
     sim.run(loader)
 
 if __name__ == "__main__":

@@ -100,9 +100,10 @@ class MACDStrat(Strat):
 
             # Calcualte simple SMA to start out
             for i in range(0, len(prices)):
-                self.emaLong += prices[i]
+                price = prices[i]
+                self.emaLong += price
                 if i < short:
-                    self.emaShort += prices[i]
+                    self.emaShort += price
             self.emaLong    /= long
             self.emaShort   /= short
 

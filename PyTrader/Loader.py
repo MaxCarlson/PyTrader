@@ -10,9 +10,9 @@ from DateHandler import DateHandler
 class Loader():
         
     
-    def __init__(self):
+    def __init__(self, dateHandler):
         self.epoch          = '1970-1-1'
-        self.dateHandler    = DateHandler(self.epoch, 'days')
+        self.dateHandler    = dateHandler
         self.tickers        = {} 
         self.symbols        = []
         self.activeTickers  = {}
@@ -20,6 +20,7 @@ class Loader():
 
     def loadCSV(self, startDate='', daysPerTicker=1000000, filename='', delimiter=','):
         idx = -1
+        num = 0
         df  = pd.read_csv(filename)
         prevSymbol = None
         for symbol in df['ticker']:
@@ -27,14 +28,16 @@ class Loader():
             if not prevSymbol:          prevSymbol = symbol
             if symbol == prevSymbol:    continue
 
-            dfTicker    = df[0:idx-1]
+            dfTicker    = df.iloc[0:idx-1, 1:-1]
             ticker      = Ticker(prevSymbol, dfTicker, self.fields, startDate)
             if not ticker.isViable(self.dateHandler, daysPerTicker, startDate):
                 continue
             self.tickers[prevSymbol] = ticker
             prevSymbol = symbol
 
-        self.createTickers(uTickers, daysPerTicker, startDateStr)
+            num += 1
+            if num >= 50:
+                break
         
     @classmethod
     def loadPickle(self, filename, extension = '.bin'):
