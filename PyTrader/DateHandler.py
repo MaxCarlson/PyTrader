@@ -14,14 +14,6 @@ class DateHandler():
         d1 = DateHandler.strToDate(date)
         return (d1 - self.epochDate).days
 
-    def dateDefault(self, date1, date0):
-        if not date0:
-            d0 = self.epochDate
-        else:
-            d0 = DateHandler.strToDate(date0)
-        d1 = DateHandler.strToDate(date1)
-        return (d0, d1)
-
     # Is date0 before (<=) date1
     def isAfter(self, date1, date0 = None):
         if not date0:

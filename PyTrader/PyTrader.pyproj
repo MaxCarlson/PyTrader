@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Clock.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DateHandler.py">
       <SubType>Code</SubType>
     </Compile>
