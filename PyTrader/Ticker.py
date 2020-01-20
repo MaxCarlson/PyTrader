@@ -14,10 +14,30 @@ class Ticker():
         self.endDate    = 0
         self.fields     = fields
 
-    def isViable(self, dateHandler, maxDays, startDate):
-        before  = dateHandler.isAfter(self.data.iat[0, 0])
-        wrange  = dateHandler.withinRange(self.data.iat[0, 0], self.data.iat[-1, 0], maxDays)
-        return before and wrange
+    @classmethod
+    def isViable(cls, data, dateHandler, maxDays, startDate):
+        before  = dateHandler.isAfter(data.iat[0, 0])
+        wrange  = dateHandler.withinRange(data.iat[0, 0], data.iat[-1, 0], maxDays) # TODO: These are messed up. Check 3rd ticker AAL to fix
+        start   = None
+        end     = None
+        idx     = 0
+        endDate = dateHandler.dateAfterDays(startDate, maxDays)
+
+        if not (before and wrange): return (False, 0, 0)
+
+        # TODO: Realistically, this work only needs to be done once
+        # Incorporate that!
+        for date in data['date']:
+            diffS = dateHandler.difference(date, startDate)
+            diffE = dateHandler.difference(date, endDate)
+            if not start and diffS <= 0:
+                start = idx
+            if diffE <= 0:
+                end = idx
+                break
+            idx += 1
+
+        return (before and wrange, start, end)
 
     def getData(self, field, dateIdx):
         return self.data.at[dateIdx, field]

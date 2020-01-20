@@ -25,21 +25,28 @@ class Loader():
         df      = pd.read_csv(filename)
         prevSymbol = None
 
+        # TODO: Need to process data with missing fields 
+        # (like missing adj_close on certain dates, etc)
 
         while idx < len(df):
-            symbol  = df.iat[0, idx]
-            data    = df.loc[df['ticker'].isin([symbol])]
-            data    = data.drop('ticker', 1)
-            ticker  = Ticker(symbol, data, self.fields, startDate)
-
-            idx     += len(data)
-            if idx >= len(df):
+            if idx >= len(df): # TODO: WRONG
                 break
 
-            if not ticker.isViable(self.dateHandler, daysPerTicker, startDate):
+            symbol  = df.iat[idx, 0]
+            if idx != 0:
+                val = df.iat[idx-1, 0]
+            data    = df.loc[df['ticker'].isin([symbol])]
+            data    = data.drop('ticker', 1)
+            idx     += len(data)
+
+            # TODO: Need to factor in weekends and holidays when adjusting date ranges
+            viable, startIdx, endIdx = Ticker.isViable(data, self.dateHandler, daysPerTicker, startDate)
+            if not viable:
                 continue
 
-            self.tickers[prevSymbol] = ticker
+            data = data[startIdx:endIdx]
+            print(data)
+            self.tickers[symbol] = Ticker(symbol, data, self.fields, startDate)
 
             # Debugging
             num += 1
