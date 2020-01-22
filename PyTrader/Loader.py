@@ -33,8 +33,8 @@ class Loader():
                 break
 
             symbol  = df.iat[idx, 0]
-            if idx != 0:
-                val = df.iat[idx-1, 0]
+            #if idx != 0:
+            #    val = df.iat[idx-1, 0]
             data    = df.loc[df['ticker'].isin([symbol])]
             data    = data.drop('ticker', 1)
             idx     += len(data)
@@ -52,26 +52,6 @@ class Loader():
             num += 1
             if num >= 50:
                 break
-
-        '''
-        for symbol in df['ticker']:
-            idx += 1
-            if not prevSymbol:          prevSymbol = symbol
-            if symbol == prevSymbol:    continue
-
-            dfTicker    = df.iloc[pIdx:idx-1, 1:-1]
-            ticker      = Ticker(prevSymbol, dfTicker, self.fields, startDate)
-            if not ticker.isViable(self.dateHandler, daysPerTicker, startDate):
-                continue
-            self.tickers[prevSymbol] = ticker
-            pIdx        = idx
-            prevSymbol  = symbol
-
-            # Debugging
-            num += 1
-            if num >= 50:
-                break
-        '''
         a = 5
         
     @classmethod

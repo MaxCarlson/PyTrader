@@ -26,9 +26,11 @@ class DateHandler():
         d1 = DateHandler.strToDate(date1)
         return d0 <= d1
 
-    # Is the distance in days between (end - start) >= maxDays 
-    def withinRange(self, start, end, maxDays):
-        return self.difference(start, end) >= maxDays
+    # Is ts0 <= ts1 && te0 >= te1
+    def withinRange(self, ts0, te0, ts1, te1):
+        start   = self.strToDate(ts1) <= self.strToDate(ts0)
+        end     = self.strToDate(te1) >= self.strToDate(te0)
+        return start and end
 
     def difference(self, first, second):
         d0 = DateHandler.strToDate(first)
