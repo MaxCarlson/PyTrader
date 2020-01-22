@@ -7,10 +7,9 @@ import DateHandler as DateHandler
 
 class Ticker():
 
-    def __init__(self, name, data, fields, startDate):
+    def __init__(self, name, data, startDate):
         self.name       = name
         self.data       = data
-        self.fields     = fields
 
     @classmethod
     def isViable(cls, data, dateHandler, maxDays, startDate):
