@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta
 
+# TODO: Dates should be handled numerically and 
+# transfored back later if needed through this class
+# TODO: Abstract this class so it handles any time period, not just days
+
 class DateHandler():
 
     def __init__(self, epoch = '1970-1-1', period = 'days'):
@@ -26,7 +30,7 @@ class DateHandler():
         d1 = DateHandler.strToDate(date1)
         return d0 <= d1
 
-    # Is ts0 <= ts1 && te0 >= te1
+    # Test if the time range ts1-te1 is within the range ts0-te0
     def withinRange(self, ts0, te0, ts1, te1):
         start   = self.strToDate(ts1) <= self.strToDate(ts0)
         end     = self.strToDate(te1) >= self.strToDate(te0)

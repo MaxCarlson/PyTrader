@@ -125,13 +125,30 @@ class MACDStrat(Strat):
             macd    = self.MACD(prices, self.shortPeriod, self.longPeriod)
             self.macds[symbol] = macd
             macd.update(ticker.getData('adj_close', dayIdx), self.shortSmoothing, self.longSmoothing)
+
+    def indentifyCrosses(self, stocks):
+        aboves = {}
+        for symbol, macd in self.macds.items():
+            aboves[symbol] = macd.emaShort > macd.emaLong
+
+        return aboves
           
     def run(self, stocks, inactives, dayIdx):
         Strat.run(self, stocks, inactives, dayIdx)
         for inactive in inactives:
             del self.macds[inactive]
 
+        buys    = []
+        sell    = []
+        aboves  = self.indentifyCrosses(stocks)
+
         for symbol, macd in self.macds.items():
             ticker = stocks.get(symbol)
             macd.update(ticker.getData('adj_close', dayIdx), self.shortSmoothing, self.longSmoothing)
+            
+            above = aboves[symbol]
+            if not above and macd.emaShort > macd.emaLong:
+                buys.append(symbol)
+            if above and macd.emaShort < macd.emaLong:
+                sell.append(symbol)
 

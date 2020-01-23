@@ -12,7 +12,7 @@ class Ticker():
         self.data       = data
 
     @classmethod
-    def isViable(cls, data, dateHandler, maxDays, startDate):
+    def isViable(cls, data, dateHandler, startDate, maxDays):
         endDate = dateHandler.dateAfterDays(startDate, maxDays)
         wrange  = dateHandler.withinRange(startDate, endDate, data.iat[0, 0], data.iat[-1, 0])
         start   = None

@@ -14,11 +14,11 @@ def main():
 
     dateHandler = DateHandler()
 
-    #loader = Loader.loadPickle(fullFileName)
+    loader = Loader.loadPickle(fullFileName)
 
-    loader = Loader(dateHandler)
-    loader.loadCSV(startDate, numDays, fileToLoad)
-    loader.save(fullFileName)
+    #loader = Loader(dateHandler)
+    #loader.loadCSV(startDate, numDays, fileToLoad)
+    #loader.save(fullFileName)
 
     sim = Simulation(loader, dateHandler, adjStartDate, 20000)
     sim.run(loader)
