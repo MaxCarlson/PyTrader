@@ -25,15 +25,14 @@ class Strat():
     def run(self, stocks, inactives, dayIdx):
         self.sellInactives(stocks, inactives, dayIdx)
 
-    def percentReturn(self):
-        return 0 # TODO
-
-    def purchase(self, symbol, ticker, num, dayIdx, field = 'adj_close'):
+    def purchase(self, symbol, ticker, num, dayIdx, ignoreCapital=False, field = 'adj_close'):
         price   = ticker.getData(field, dayIdx)
         asset   = self.assets.get(symbol)
         if not asset: 
             asset = Asset()
-        
+        if not ignoreCapital and self.capital < price * num:
+            return False
+
         netCost = asset.increasePosition(num, price)
         self.assets[symbol] = asset
         self.capital -= netCost
@@ -41,20 +40,30 @@ class Strat():
     def sellAllHoldings(self, stocks, dayIdx):
         self.sellInactives(stocks, [key for key, a in self.assets.items()], dayIdx)
 
+    # num = -1 for sell all of an asset
+    def sellAsset(self, stocks, symbol, dayIdx, num = -1):
+        asset = self.assets.get(symbol)
+        if not asset: return
+
+        price = stocks[symbol].getData('adj_close', dayIdx)
+
+        if num > asset.size():    
+            raise RuntimeError("Invalid number of assets put up for sale")
+        elif num == -1:
+            num = asset.size()
+
+        self.capital += asset.decreasePosition(num, price)
+
+
     # If we have no more data for a stock, sell it off
     def sellInactives(self, stocks, inactives, dayIdx):
-        if len(inactives) <= 0: return
-
-        sold = False
         for inactive in inactives:
-            asset = self.assets.get(inactive)
-            if not asset: continue
+            self.sellAsset(stocks, inactive, dayIdx - 1, -1)
 
-            price = stocks[inactive].getData('adj_close', dayIdx - 1)
-            if asset.size(): 
-                sold = True
-            asset.decreasePosition(asset.size(), price)
-            self.capital += asset.totalReturn
+    def percentReturn(self):
+        percent = sum([a.percentReturn for key, a in self.assets.items()])
+        percent /= len(self.assets)
+        return percent
 
 
 # Simulate an Index fund of all the stocks in our backtest
@@ -71,16 +80,11 @@ class BuyAndHold(Strat):
         self.capital = 0
         for symbol, ticker in stocks.items():
             if symbol in inactives: continue
-            self.purchase(symbol, ticker, 1, dayIdx)
+            self.purchase(symbol, ticker, 1, dayIdx, ignoreCapital=True)
         self.capital = -self.capital
 
     def run(self, stocks, inactives, dayIdx):
         Strat.run(self, stocks, inactives, dayIdx)
-    
-    def percentReturn(self):
-        percent = sum([a.percentReturn for key, a in self.assets.items()])
-        percent /= len(self.assets)
-        return percent
 
                 
 
@@ -151,4 +155,12 @@ class MACDStrat(Strat):
                 buys.append(symbol)
             if above and macd.emaShort < macd.emaLong:
                 sell.append(symbol)
+
+        for symbol in sell:
+            self.sellAsset(stocks, symbol, dayIdx)
+
+
+        for symbol in buys:
+            ticker = stocks.get(symbol)
+            self.purchase(symbol, ticker, 1, dayIdx)
 

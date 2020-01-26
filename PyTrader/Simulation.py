@@ -70,9 +70,6 @@ class Simulation():
             else:
                 Strat.run(strat, loader.tickers, inactives, self.idx)
 
-    def updateBenchmarks(self, loader, inactives):
-        pass
-
     # Debugging tool
     def checkDates(self, loader):
         prevDate = None
@@ -90,4 +87,7 @@ class Simulation():
         for bench in self.benchmarks:
             print(type(bench).__name__, bench.percentReturn(), '%\n')
 
+        print("Stratgies: ")
+        for strat in self.strats:
+            print(type(strat).__name__, strat.percentReturn(), '%\n')
 

@@ -27,4 +27,5 @@ class Asset():
         self.percentReturn  = (self.percentReturn * self.totalSold + percentReturn * numToSell) / (self.totalSold + numToSell)
         self.totalSold      += numToSell
         self.totalReturn    += numToSell * price
+        return numToSell * price
 
