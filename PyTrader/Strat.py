@@ -95,6 +95,9 @@ class DCA(Strat):
     def run(self, stocks, inactives, dayIdx):
         pass
 
+# TODO: 
+class MeanReversion(Strat):
+    pass
 
 class MACDStrat(Strat):
     class MACD():
